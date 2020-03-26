@@ -7,6 +7,7 @@
 #include "WinDesign.h"
 #include "WinDesignDlg.h"
 #include "afxdialogex.h"
+#include "CResultDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -59,12 +60,16 @@ CWinDesignDlg::CWinDesignDlg(CWnd* pParent /*=nullptr*/)
 void CWinDesignDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_Daikuanvalue, Dk_value);
+	DDX_Control(pDX, IDC_RTnumvalue, Rnum_value);
 }
 
 BEGIN_MESSAGE_MAP(CWinDesignDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDOK, &CWinDesignDlg::OnBnClickedOk)
+	ON_BN_CLICKED(IDC_Exit, &CWinDesignDlg::OnBnClickedExit)
 END_MESSAGE_MAP()
 
 
@@ -100,6 +105,8 @@ BOOL CWinDesignDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
+	initDkvalue();
+	initNumvalue();
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -152,4 +159,43 @@ HCURSOR CWinDesignDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
 }
+
+
+
+void CWinDesignDlg::OnBnClickedOk()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CResultDlg result;
+	result.DoModal();
+}
+
+void CWinDesignDlg::OnBnClickedExit()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CDialogEx::OnOK();
+}
+
+void CWinDesignDlg::initDkvalue()
+{
+	Dk_value.AddString(_T("请选择"));
+	Dk_value.AddString(_T("10M"));
+	Dk_value.AddString(_T("20M"));
+	Dk_value.AddString(_T("40M"));
+	Dk_value.SetCurSel(0);//从位置0开始显示
+}
+
+void CWinDesignDlg::initNumvalue()
+{
+	Rnum_value.AddString(_T("请选择"));
+	Rnum_value.AddString(_T("8"));
+	Rnum_value.AddString(_T("16"));
+	Rnum_value.AddString(_T("32"));
+	Rnum_value.SetCurSel(0);//从位置0开始显示
+}
+
+
+
+
+
+
 

@@ -31,4 +31,14 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnBnClickedOk();
+	afx_msg void OnBnClickedExit();
+	// 带宽的取值
+	CComboBox Dk_value;
+	// RT数量
+	CComboBox Rnum_value;
+	//初始化下拉框值
+	void initDkvalue();
+	void initNumvalue();
 };
