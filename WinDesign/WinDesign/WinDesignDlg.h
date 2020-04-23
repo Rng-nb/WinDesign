@@ -3,7 +3,7 @@
 //
 
 #pragma once
-
+#include <vector>
 
 // CWinDesignDlg 对话框
 class CWinDesignDlg : public CDialogEx
@@ -34,11 +34,48 @@ protected:
 public:
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnBnClickedExit();
-	// 带宽的取值
 	CComboBox Dk_value;
-	// RT数量
 	CComboBox Rnum_value;
-	//初始化下拉框值
+	CComboBox Dispachtime;
+	CComboBox Dispachlenth;
+	CComboBox Dispachnum;
 	void initDkvalue();
 	void initNumvalue();
+	void initDispachtime();
+	void initDispachlenth();
+	void initDispachnum();
+	void initAim();
+	void initThoughoutJain();
+	void initDispachtype();
+	void Dispachinfo();
+	void getThoughtorJain(std::vector<double> & data);
+	
+	
+	afx_msg void OnCbnSelchangeDispachtime();
+	afx_msg void OnCbnSelchangeDaikuanvalue();
+	afx_msg void OnCbnSelchangeRtnumvalue();
+	afx_msg void OnCbnSelchangeDispachlenth();
+	afx_msg void OnCbnSelchangeDispachnum();
+private:
+	int aim;
+	int time;
+	int sta_num;
+	int dispachnum;
+	int thoughoutjain;
+	int dispachtype;
+	double dispachlenth;
+	int time_list[3] = {100, 200, 500};
+	int sta_num_list[3] = { 30, 50, 70 };
+	int dispachnum_list[3] = {3, 5, 8};
+	int dispachtype_list[3] = {1, 2, 3};
+	double dispachlenth_list[3] = {10.0, 20.0, 30.0};
+	std::vector<double> info_data;
+	
+public:
+	CComboBox Aim;
+	CComboBox ThoughoutJain;
+	CComboBox Dispachtype;
+	afx_msg void OnCbnSelchangeAim();
+	afx_msg void OnCbnSelchangeThoughJain();
+	afx_msg void OnCbnSelchangeDispachtype();
 };

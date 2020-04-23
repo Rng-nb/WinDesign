@@ -36,6 +36,15 @@
     <ClInclude Include="CResultDlg.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="STA.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Dispach.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\PointsOrdering.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinDesign.cpp">
@@ -48,6 +57,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="CResultDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="STA.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Dispach.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
