@@ -63,6 +63,7 @@ private:
 	int dispachnum;
 	int thoughoutjain;
 	int dispachtype;
+	int dkvalue;
 	double dispachlenth;
 	int time_list[3] = {100, 200, 500};
 	int sta_num_list[3] = { 30, 50, 70 };

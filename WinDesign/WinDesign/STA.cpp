@@ -5,7 +5,6 @@ STA::STA() {
 	std::uniform_real_distribution<double> random_un(1, 5);//1-5均匀分布的随机double
 	lambda_ex_time = random_un(random);//设定一个随机的初始λ值
 	lambda_po_info = random_un(random);//设定一个随机的初始λ值
-	channel_space = 5;
 	info_dispached.clear();
 }
 
@@ -25,7 +24,7 @@ void STA::produceInfo() {
 		int info_rand = random_info(random);//随机一个数据包数量
 
 		std::uniform_int_distribution<int> random_un(1, 8);//随机一个速度值
-		channel_speed = speed[random_un(random) - 1] * (channel_space / 5.0);
+		channel_speed = speed[random_un(random) - 1];
 
 		Info info_tmp; //存储产生的一次随机信息
 		flag_first == true ? info_tmp.time = 0.0, flag_first = false : info_tmp.time = time_tmp + time_rand * 10, time_tmp += time_rand * 10;
@@ -35,9 +34,6 @@ void STA::produceInfo() {
 	}
 }
 
-void STA::setChannel(int channel) {
-	channel_space = channel;
-}
 //比例公平的优先级
 double STA::getPrivity_f1(int timenow) {
 	if (info_produce.front().time > (timenow - 1) * 10)
@@ -104,7 +100,7 @@ void STA::getDispach(double &timeleft) {//先分配1ms,再利用剩余时间进行分配
 				dispached.time = timeleft + 1;
 				//更新缓冲区队首的信息
 				std::uniform_int_distribution<int> random_un(1, 8);//随机一个速度值
-				channel_speed = speed[random_un(random) - 1] * (channel_space / 5.0);
+				channel_speed = speed[random_un(random) - 1];
 				info_tmp.info_speed = channel_speed * 4;
 				info_produce.push_front(info_tmp);
 				timeleft = 0.0;
@@ -116,7 +112,7 @@ void STA::getDispach(double &timeleft) {//先分配1ms,再利用剩余时间进行分配
 			dispached.time = 1.0;
 			//更新缓冲区队首的信息
 			std::uniform_int_distribution<int> random_un(1, 8);//随机一个速度值
-			channel_speed = speed[random_un(random) - 1] * (channel_space / 5.0);
+			channel_speed = speed[random_un(random) - 1];
 			info_tmp.info_speed = channel_speed * 4;
 			info_produce.push_front(info_tmp);
 		}

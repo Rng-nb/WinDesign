@@ -9,6 +9,7 @@ private:
 	int aim;
 	int type;
 	int time;
+	int dkvalue;
 	int sta_num;
 	int dispachnum;
 	int dispachedtime;

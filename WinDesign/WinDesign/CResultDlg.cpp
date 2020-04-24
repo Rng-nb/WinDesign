@@ -66,6 +66,10 @@ void CResultDlg::OnPaint() {
 	std::string aim_str[2] = { "比例公平", "最大吞吐量" };
 	std::string thoughoutjain_str[2] = { "Thoughout", "Jain" };
 	std::string dispachtype_str[3] = { "比例公平调度", "轮询调度", "最大MCS调度" };
+	std::string dispachlenth_str[3] = {"10ms", "20ms", "30ms"};
+	std::string sta_num_str[3] = {"30", "50", "70"};
+	std::string dispachtime_str[3] = {"100T", "200T", "500T"};
+	std::string dispachnum_str[3] = {"3", "5", "8"};
 	std::string str1; 
 	std::string str2; 
 
@@ -77,26 +81,48 @@ void CResultDlg::OnPaint() {
 		CString csout3(str3.c_str());
 		SetTextAlign(dc, VTA_CENTER);
 		dc.TextOutW(rect.right / 2, 40, csout3);
+		
 		int len = data_show.size() / 3;
 		std::vector<double> tmp;
 		tmp = data_show;
+
+		double max = 0.0;
+		int basex_size = 0;
+		int basey_size = 0;
+		for (int i = 0; i < data_show.size(); ++i) {
+			data_show[i] > max ? max = data_show[i] : max = max;
+		}
+		basex_size = std::floor((rect.right - 100) / len);
+		basey_size = std::floor((rect.bottom - 100) / std::ceil(max));
+
 		for (int i = 0; i < 3; ++i) {
 			data_show.clear();
 			for (int j = i * len; j < (i + 1) * len; ++j) {
 				data_show.push_back(tmp[j]);
 			}
 			CPen pen;
+			COLORREF color;
 			if (i == 0) {
 				pen.CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
+				color = RGB(255, 0, 0);
 			}
-			else if(i == 1) {
+			else if (i == 1) {
 				pen.CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
+				color = RGB(0, 0, 0);
 			}
 			else if (i == 2) {
 				pen.CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
+				color = RGB(0, 0, 255);
 			}
+
 			dc.SelectObject(&pen);
-			setxy(rect.right - 100, rect.bottom - 100);
+			std::string str = sta_num_str[i];
+			CString csout(str.c_str());
+			SetTextAlign(dc, VTA_RIGHT);
+			SetTextColor(dc, color);
+			dc.TextOutW(rect.right - 200, 50 + 20 * i, csout);
+
+			setxy(rect.right - 100, rect.bottom - 100, basex_size, basey_size);
 			dc.Polyline(paint_info, data_show.size());
 		}
 	}
@@ -108,10 +134,25 @@ void CResultDlg::OnPaint() {
 		CString csout3(str3.c_str());
 		SetTextAlign(dc, VTA_CENTER);
 		dc.TextOutW(rect.right / 2, 40, csout3);
+		
 		int lenlen = 0;
 		std::vector<double> tmp;
 		tmp = data_show; 
 		int time_list[3] = { 100, 200, 500 };
+
+		int max_len = -1;
+		for (int i = 0; i < 3; ++i) {
+			time_list[i] > max_len ? max_len = time_list[i] : max_len = max_len;
+		}
+		double max = 0.0;
+		int basex_size = 0;
+		int basey_size = 0;
+		for (int i = 0; i < data_show.size(); ++i) {
+			data_show[i] > max ? max = data_show[i] : max = max;
+		}
+		basex_size = std::floor((rect.right - 100) / max_len);
+		basey_size = std::floor((rect.bottom - 100) / std::ceil(max));
+
 		for (int i = 0; i < 3; ++i) {
 			data_show.clear();
 			int len = time_list[i];
@@ -119,22 +160,30 @@ void CResultDlg::OnPaint() {
 				data_show.push_back(tmp[j]);
 			}
 			CPen pen;
+			COLORREF color;
 			if (i == 0) {
 				pen.CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
+				color = RGB(255, 0, 0);
 			}
 			else if (i == 1) {
 				pen.CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
+				color = RGB(0, 0, 0);
 			}
 			else if (i == 2) {
 				pen.CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
+				color = RGB(0, 0, 255);
 			}
+
 			dc.SelectObject(&pen);
-			setxy(rect.right - 100, rect.bottom - 100);
+			std::string str = dispachtime_str[i];
+			CString csout(str.c_str());
+			SetTextAlign(dc, VTA_RIGHT);
+			SetTextColor(dc, color);
+			dc.TextOutW(rect.right - 200, 50 + 20 * i, csout);
+
+			setxy(rect.right - 100, rect.bottom - 100, basex_size, basey_size);
 			dc.Polyline(paint_info, data_show.size());
 			lenlen += len;
-			std::string  str = std::to_string(data_show.size());
-			CString strtest(str.c_str());
-			MessageBox(strtest, _T("test"));
 		}
 	}
 	else if (dispachnum == -1) {
@@ -145,26 +194,48 @@ void CResultDlg::OnPaint() {
 		CString csout3(str3.c_str());
 		SetTextAlign(dc, VTA_CENTER);
 		dc.TextOutW(rect.right / 2, 40, csout3);
+		
 		int len = data_show.size() / 3;
 		std::vector<double> tmp;
 		tmp = data_show;
+		
+		double max = 0.0;
+		int basex_size = 0;
+		int basey_size = 0;
+		for (int i = 0; i < data_show.size(); ++i) {
+			data_show[i] > max ? max = data_show[i] : max = max;
+		}
+		basex_size = std::floor((rect.right - 100) / len);
+		basey_size = std::floor((rect.bottom - 100) / std::ceil(max));
+
 		for (int i = 0; i < 3; ++i) {
 			data_show.clear();
 			for (int j = i * len; j < (i + 1) * len; ++j) {
 				data_show.push_back(tmp[j]);
 			}
 			CPen pen;
+			COLORREF color;
 			if (i == 0) {
 				pen.CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
+				color = RGB(255, 0, 0);
 			}
 			else if (i == 1) {
 				pen.CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
+				color = RGB(0, 0, 0);
 			}
 			else if (i == 2) {
 				pen.CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
+				color = RGB(0, 0, 255);
 			}
+
 			dc.SelectObject(&pen);
-			setxy(rect.right - 100, rect.bottom - 100);
+			std::string str = sta_num_str[i];
+			CString csout(str.c_str());
+			SetTextAlign(dc, VTA_RIGHT);
+			SetTextColor(dc, color);
+			dc.TextOutW(rect.right - 200, 50 + 20 * i, csout);
+			
+			setxy(rect.right - 100, rect.bottom - 100, basex_size, basey_size);
 			dc.Polyline(paint_info, data_show.size());
 		}
 	}
@@ -176,26 +247,48 @@ void CResultDlg::OnPaint() {
 		CString csout3(str3.c_str());
 		SetTextAlign(dc, VTA_CENTER);
 		dc.TextOutW(rect.right / 2, 40, csout3);
+		
 		int len = data_show.size() / 3;
 		std::vector<double> tmp;
 		tmp = data_show;
+		
+		double max = 0.0;
+		int basex_size = 0;
+		int basey_size = 0;
+		for (int i = 0; i < data_show.size(); ++i) {
+			data_show[i] > max ? max = data_show[i] : max = max;
+		}
+		basex_size = std::floor((rect.right - 100) / len);
+		basey_size = std::floor((rect.bottom - 100) / std::ceil(max));
+
 		for (int i = 0; i < 3; ++i) {
 			data_show.clear();
 			for (int j = i * len; j < (i + 1) * len; ++j) {
 				data_show.push_back(tmp[j]);
 			}
 			CPen pen;
+			COLORREF color;
 			if (i == 0) {
 				pen.CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
+				color = RGB(255, 0, 0);
 			}
 			else if (i == 1) {
 				pen.CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
+				color = RGB(0, 0, 0);
 			}
 			else if (i == 2) {
 				pen.CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
+				color = RGB(0, 0, 255);
 			}
+
 			dc.SelectObject(&pen);
-			setxy(rect.right - 100, rect.bottom - 100);
+			std::string str = dispachlenth_str[i];
+			CString csout(str.c_str());
+			SetTextAlign(dc, VTA_RIGHT);
+			SetTextColor(dc, color);
+			dc.TextOutW(rect.right - 200, 50 + 20 * i, csout);
+
+			setxy(rect.right - 100, rect.bottom - 100, basex_size, basey_size);
 			dc.Polyline(paint_info, data_show.size());
 		}
 	}
@@ -210,23 +303,44 @@ void CResultDlg::OnPaint() {
 		int len = data_show.size() / 3;
 		std::vector<double> tmp;
 		tmp = data_show;
+		
+		double max = 0.0;
+		int basex_size = 0;
+		int basey_size = 0;
+		for (int i = 0; i < data_show.size(); ++i) {
+			data_show[i] > max ? max = data_show[i] : max = max;
+		}
+		basex_size = std::floor((rect.right - 100) / len);
+		basey_size = std::floor((rect.bottom - 100) / std::ceil(max));
+		
 		for (int i = 0; i < 3; ++i) {
 			data_show.clear();
 			for (int j = i * len; j < (i + 1) * len; ++j) {
 				data_show.push_back(tmp[j]);
 			}
 			CPen pen;
+			COLORREF color;
 			if (i == 0) {
 				pen.CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
+				color = RGB(255, 0, 0);
 			}
 			else if (i == 1) {
 				pen.CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
+				color = RGB(0, 0, 0);
 			}
 			else if (i == 2) {
 				pen.CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
+				color = RGB(0, 0, 255);
 			}
+			
 			dc.SelectObject(&pen);
-			setxy(rect.right - 100, rect.bottom - 100);
+			std::string str = dispachtype_str[i];
+			CString csout(str.c_str());
+			SetTextAlign(dc, VTA_RIGHT);
+			SetTextColor(dc, color);
+			dc.TextOutW(rect.right - 200 , 50 + 20 * i, csout);
+			
+			setxy(rect.right - 100, rect.bottom - 100, basex_size, basey_size);
 			dc.Polyline(paint_info, data_show.size());
 		}
 	}
@@ -234,19 +348,31 @@ void CResultDlg::OnPaint() {
 		str1 = "优化目标:" + aim_str[aim - 1] + " 调度时间:" + std::to_string(time) +
 			"T" + " STA数量:" + std::to_string(sta_num) + " 调度数量:" + std::to_string(dispachnum) + " 调度周期" + std::to_string((int)dispachlenth) + "ms";
 		str2 = " 调度机制:" + dispachtype_str[dispachtype - 1] + " 性能参数:" + thoughoutjain_str[thoughoutjain - 1];
+		double max = 0.0;
+		int basex_size = 0;
+		int basey_size = 0;
+		for (int i = 0; i < data_show.size(); ++i) {
+			data_show[i] > max ? max = data_show[i] : max = max;
+		}
+		basex_size = std::floor((rect.right - 100) / data_show.size());
+		basey_size = std::floor((rect.bottom - 100) / std::ceil(max));
+
 		CPen pen;
 		pen.CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
 		dc.SelectObject(&pen);
-		setxy(rect.right - 100, rect.bottom - 100);
+
+		setxy(rect.right - 100, rect.bottom - 100, basex_size, basey_size);
 		dc.Polyline(paint_info, data_show.size());
 	}
 	
 	CString csout1(str1.c_str());
 	SetTextAlign(dc, VTA_CENTER);
+	SetTextColor(dc, RGB(0, 0, 0));
 	dc.TextOutW(rect.right / 2, 0, csout1);
 
 	CString csout2(str2.c_str());
 	SetTextAlign(dc, VTA_CENTER);
+	SetTextColor(dc, RGB(0, 0, 0));
 	dc.TextOutW(rect.right / 2, 20, csout2);
 }
 
@@ -260,21 +386,12 @@ BOOL CResultDlg::OnInitDialog() {
 	CDialogEx::CenterWindow();
 	return TRUE;  
 }
-void CResultDlg::setxy(double w, double l) {
-	double max = 0.0;
-	int basex_size = 0;
-	int basey_size = 0;
-	for (int i = 0; i < data_show.size(); ++i) {
-		data_show[i] > max ? max = data_show[i] : max = max;
-	}
-
-	basex_size = std::ceil(w / data_show.size());
-	basey_size = std::ceil(l / std::ceil(max));
+void CResultDlg::setxy(double w, double l, int basex, int basey) {
 	paint_info = new CPoint[data_show.size()];
 	for (int i = 0; i < data_show.size(); ++i) {
 		CPoint p;
-		p.x = i * basex_size + 50;
-		p.y = l - std::ceil(data_show[i] * basey_size) + 50;
+		p.x = i * basex + 50;
+		p.y = l - std::ceil(data_show[i] * basey) + 50;
 		paint_info[i] = p;
 	}
 }

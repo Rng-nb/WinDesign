@@ -11,6 +11,7 @@ Dispach::Dispach() {
 	dispachnum = 8;
 	dispachedtime = 0;
 	dispachlenth = 20.0;
+	dkvalue = 20;
 	sta_info.clear();
 	sta_info_init.clear();
 	privity.clear();
@@ -32,6 +33,7 @@ void Dispach::setDispach(int time, int dispachnum, double dispachlenth) {
 }
 
 void Dispach::startDispach(int type) {
+	
 	switch (type) {
 	case 1:
 		this->aim = 1;
@@ -69,6 +71,7 @@ void Dispach::startDispach(int type) {
 }
 
 void Dispach::produceInfo() {
+	this->dkvalue = dkvalue;
 	std::ofstream data("data.txt");
 	for (int i = 0; i < 100; ++i) {
 		STA *sta = new STA();
@@ -96,9 +99,35 @@ void Dispach::clearInfo() {
 void Dispach::initInfo(int sta_num) {
 	this->sta_num = sta_num;
 	sta_info.clear();
+	/*if (dkvalue == -1) {
+		int dkvalue_list[3] = {20, 40, 80};
+		for (int i = 0; i < 3; ++i) {
+			int n = dkvalue_list[i] / 20;
+			for (int k = 0; k < sta_num; ++k) {
+				STA *tmp;
+				tmp = sta_info_init[k];
+				for (int j = 0; j < tmp->info_produce.size(); ++j) {
+					tmp->info_produce[j].info_speed *= n;
+				}
+				sta_info.push_back(sta_info_init[k]);
+			}
+		}
+	}
+	else {
+		int n = dkvalue / 20;
+		for (int i = 0; i < sta_num; ++i) {
+			STA *tmp;
+			tmp = sta_info_init[i];
+			for (int j = 0; j < tmp->info_produce.size(); ++j) {
+				tmp->info_produce[j].info_speed *= n;
+			}
+			sta_info.push_back(sta_info_init[i]);
+		}
+	}*/
 	for (int i = 0; i < sta_num; ++i) {
 		sta_info.push_back(sta_info_init[i]);
 	}
+	
 }
 
 void Dispach::getPrivityRR(int i) {//轮询调度重排优先级

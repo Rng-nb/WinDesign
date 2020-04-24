@@ -15,7 +15,6 @@ public:
 	STA();
 	~STA();
 	void produceInfo();
-	void setChannel(int channel);
 	void getDispach(double &timeleft);//该STA被第二种调度
 	double getPrivity_f1(int timenow);//获得该STA当前的优先级,比例公平
 	double getPrivity_f2(int timenow);//最大吞吐量
@@ -28,7 +27,6 @@ private:
 	double lambda_ex_time;//时间符合指数分布
 	double lambda_po_info;//数据符合泊松分布
 	double channel_speed;//速度
-	int channel_space;
 
 	std::random_device rd;//借此来产生一个随机种子，不然每个随机数队列时相同
 	std::default_random_engine random{ rd() };//随机数引擎

@@ -36,5 +36,5 @@ public:
 	std::vector<double> data_show;
 	CPoint * paint_info;
 public:
-	void setxy(double w, double l);
+	void setxy(double w, double l, int basex, int basey);
 };

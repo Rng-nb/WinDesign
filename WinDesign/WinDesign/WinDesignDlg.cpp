@@ -181,6 +181,7 @@ void CWinDesignDlg::OnBnClickedOk() {
 	for (int i = 0; i < info_data.size(); ++i) {
 		result.data_show.push_back(info_data[i]);
 	}
+	info_data.clear();
 	result.DoModal();
 }
 
@@ -203,7 +204,16 @@ void CWinDesignDlg::OnCbnSelchangeDaikuanvalue() {
 	int index = 0;
 	index = Dk_value.GetCurSel();
 	Dk_value.GetLBText(index, str);
-	MessageBox(str, _T("test"));
+	if (str == "20M")
+		dkvalue = 20;
+	else if (str == "40M")
+		dkvalue = 40;
+	else if (str == "80M")
+		dkvalue = 80;
+	else if (str == "不同带宽对比")
+		dkvalue = -1;
+	else
+		MessageBox(_T("请选择带宽"), _T("提示"));
 }
 
 void CWinDesignDlg::initNumvalue() {
@@ -381,23 +391,14 @@ void CWinDesignDlg::OnCbnSelchangeDispachtype()
 }
 
 void CWinDesignDlg::getThoughtorJain(std::vector<double> & data) {
-	if (sta_num == -1 || time == -1 || dispachnum == -1 || dispachlenth == -1 || dispachtype == -1) {
-		for (int i = 0; i < data.size(); ++i) {
-			info_data.push_back(data[i]);
-		}
-	}
-	else {
-		info_data.clear();
-		for (int i = 0; i < data.size(); ++i) {
-			info_data.push_back(data[i]);
-		}
-	}
-	
+	for (int i = 0; i < data.size(); ++i) {
+		info_data.push_back(data[i]);
+	}	
 }
 
 void CWinDesignDlg::Dispachinfo() {
-	Dispach dispach;
-	dispach.produceInfo(); 
+	Dispach dispach; 
+	dispach.produceInfo();
 	if (sta_num == -1) {
 		for (int i = 0; i < 3; ++i) {
 			dispach.initInfo(sta_num_list[i]);
@@ -447,6 +448,17 @@ void CWinDesignDlg::Dispachinfo() {
 			dispach.initInfo(sta_num);
 			dispach.setDispach(time, dispachnum, dispachlenth);
 			dispach.startDispach(aim * dispachtype_list[i]);
+			if (thoughoutjain == 1)
+				getThoughtorJain(dispach.thoughtout_vector);
+			else
+				getThoughtorJain(dispach.jain_vector);
+		}
+	}
+	else if (dkvalue == -1) {
+		for (int i = 0; i < 3; ++i) {
+			dispach.initInfo(sta_num);
+			dispach.setDispach(time, dispachnum, dispachlenth);
+			dispach.startDispach(aim * dispachtype);
 			if (thoughoutjain == 1)
 				getThoughtorJain(dispach.thoughtout_vector);
 			else
