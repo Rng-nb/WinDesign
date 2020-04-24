@@ -70,7 +70,7 @@ void Dispach::startDispach(int type) {
 	}
 }
 
-void Dispach::produceInfo() {
+void Dispach::produceInfo(int dkvalue) {
 	this->dkvalue = dkvalue;
 	std::ofstream data("data.txt");
 	for (int i = 0; i < 100; ++i) {
@@ -99,35 +99,33 @@ void Dispach::clearInfo() {
 void Dispach::initInfo(int sta_num) {
 	this->sta_num = sta_num;
 	sta_info.clear();
-	/*if (dkvalue == -1) {
+	if (dkvalue == -1) {
 		int dkvalue_list[3] = {20, 40, 80};
 		for (int i = 0; i < 3; ++i) {
 			int n = dkvalue_list[i] / 20;
 			for (int k = 0; k < sta_num; ++k) {
-				STA *tmp;
-				tmp = sta_info_init[k];
-				for (int j = 0; j < tmp->info_produce.size(); ++j) {
-					tmp->info_produce[j].info_speed *= n;
+				STA *tmp = new STA();
+				for (int j = 0; j < sta_info_init[k]->info_produce.size(); ++j) {
+					Info tmp_info = sta_info_init[k]->info_produce[j];
+					tmp_info.info_speed *= n;
+					tmp->info_produce.push_back(tmp_info);
 				}
-				sta_info.push_back(sta_info_init[k]);
+				sta_info.push_back(tmp);
 			}
 		}
 	}
 	else {
 		int n = dkvalue / 20;
 		for (int i = 0; i < sta_num; ++i) {
-			STA *tmp;
-			tmp = sta_info_init[i];
-			for (int j = 0; j < tmp->info_produce.size(); ++j) {
-				tmp->info_produce[j].info_speed *= n;
+			STA *tmp = new STA();
+			for (int j = 0; j < sta_info_init[i]->info_produce.size(); ++j) {
+				Info tmp_info = sta_info_init[i]->info_produce[j];
+				tmp_info.info_speed *= n;
+				tmp->info_produce.push_back(tmp_info);
 			}
-			sta_info.push_back(sta_info_init[i]);
+			sta_info.push_back(tmp);
 		}
-	}*/
-	for (int i = 0; i < sta_num; ++i) {
-		sta_info.push_back(sta_info_init[i]);
-	}
-	
+	}	
 }
 
 void Dispach::getPrivityRR(int i) {//轮询调度重排优先级
@@ -199,51 +197,101 @@ void Dispach::function1() { //比例公平调度
 	double thoughout = 0.0;
 	double jain = 0.0;
 	double timeleft = 0.0;
-	dispachedtime = 0;
-	time_dispach = time;
 	initInfo(sta_num);
 	thoughtout_vector.clear();
 	jain_vector.clear();
-	while (time_dispach--) {
-		++dispachedtime;
-		for (int i = 0; i < sta_info.size(); ++i) {//得到所有优先级
-			getPrivityPF(i);
-		}
-		for (int i = 0; i < privity.size() && i < dispachnum; ++i) {//选择优先级最高的n个调度
-			dispach_id.push_back(privity[i].first);
-		}
-		//根据优化目标重排优先级
-		if (aim == 2) {//最大吞吐量优化，根据mcs值重排优先级分配资源
-			std::vector<std::pair<int, double> > tmp;
-			tmp.clear();
-			for (int i = 0; i < dispach_id.size(); ++i) {
-				int j = 0;
-				double mcs_tmp = 0.0;
-				mcs_tmp = sta_info[dispach_id[i]]->getPrivity_f2(dispachedtime);
-				for (j = 0; j < tmp.size(); ++j) {
-					if (mcs_tmp > tmp[j].second)
-						break;
+	if (dkvalue != -1) {
+		dispachedtime = 0;
+		time_dispach = time;
+		while (time_dispach--) {
+			++dispachedtime;
+			for (int i = 0; i < sta_info.size(); ++i) {//得到所有优先级
+				getPrivityPF(i);
+			}
+			for (int i = 0; i < privity.size() && i < dispachnum; ++i) {//选择优先级最高的n个调度
+				dispach_id.push_back(privity[i].first);
+			}
+			//根据优化目标重排优先级
+			if (aim == 2) {//最大吞吐量优化，根据mcs值重排优先级分配资源
+				std::vector<std::pair<int, double> > tmp;
+				tmp.clear();
+				for (int i = 0; i < dispach_id.size(); ++i) {
+					int j = 0;
+					double mcs_tmp = 0.0;
+					mcs_tmp = sta_info[dispach_id[i]]->getPrivity_f2(dispachedtime);
+					for (j = 0; j < tmp.size(); ++j) {
+						if (mcs_tmp > tmp[j].second)
+							break;
+					}
+					tmp.insert(tmp.begin() + j, std::pair<int, double>(dispach_id[i], mcs_tmp));
 				}
-				tmp.insert(tmp.begin() + j, std::pair<int, double>(dispach_id[i], mcs_tmp));
+				dispach_id.clear();
+				for (int i = 0; i < tmp.size(); ++i) {//选择优先级最高的n个调度
+					dispach_id.push_back(tmp[i].first);
+				}
+				tmp.clear();
 			}
-			dispach_id.clear();
-			for (int i = 0; i < tmp.size(); ++i) {//选择优先级最高的n个调度
-				dispach_id.push_back(tmp[i].first);
-			}
-			tmp.clear();
-		}
 
-		timeleft = dispachlenth - dispachnum * 1.0;//周期设置
-		speed.clear();
-		cost.clear();
-		info.clear();
-		getThoughoutJain(timeleft, thoughout, jain);
-		thoughtout_vector.push_back(thoughout);
-		jain_vector.push_back(jain);
-		fc1 << "吞吐量：" << thoughout << "Mb/s" << std::endl;
-		fc1 << "Jain：" << jain << std::endl;
-		privity.clear();
-		dispach_id.clear();
+			timeleft = dispachlenth - dispachnum * 1.0;//周期设置
+			speed.clear();
+			cost.clear();
+			info.clear();
+			getThoughoutJain(timeleft, thoughout, jain);
+			thoughtout_vector.push_back(thoughout);
+			jain_vector.push_back(jain);
+			fc1 << "吞吐量：" << thoughout << "Mb/s" << std::endl;
+			fc1 << "Jain：" << jain << std::endl;
+			privity.clear();
+			dispach_id.clear();
+		}
+	}
+	else {
+		for (int m_t = 0; m_t < 3; ++m_t) {
+			dispachedtime = 0;
+			time_dispach = time;
+			int len = sta_info.size() / 3;
+			while (time_dispach--) {
+				++dispachedtime;
+				for (int i = len * m_t; i < len * (m_t + 1); ++i) {//得到所有优先级
+					getPrivityPF(i);
+				}
+				for (int i = 0; i < privity.size() && i < dispachnum; ++i) {//选择优先级最高的n个调度
+					dispach_id.push_back(privity[i].first);
+				}
+				//根据优化目标重排优先级
+				if (aim == 2) {//最大吞吐量优化，根据mcs值重排优先级分配资源
+					std::vector<std::pair<int, double> > tmp;
+					tmp.clear();
+					for (int i = 0; i < dispach_id.size(); ++i) {
+						int j = 0;
+						double mcs_tmp = 0.0;
+						mcs_tmp = sta_info[dispach_id[i]]->getPrivity_f2(dispachedtime);
+						for (j = 0; j < tmp.size(); ++j) {
+							if (mcs_tmp > tmp[j].second)
+								break;
+						}
+						tmp.insert(tmp.begin() + j, std::pair<int, double>(dispach_id[i], mcs_tmp));
+					}
+					dispach_id.clear();
+					for (int i = 0; i < tmp.size(); ++i) {//选择优先级最高的n个调度
+						dispach_id.push_back(tmp[i].first);
+					}
+					tmp.clear();
+				}
+
+				timeleft = dispachlenth - dispachnum * 1.0;//周期设置
+				speed.clear();
+				cost.clear();
+				info.clear();
+				getThoughoutJain(timeleft, thoughout, jain);
+				thoughtout_vector.push_back(thoughout);
+				jain_vector.push_back(jain);
+				fc1 << "吞吐量：" << thoughout << "Mb/s" << std::endl;
+				fc1 << "Jain：" << jain << std::endl;
+				privity.clear();
+				dispach_id.clear();
+			}
+		}
 	}
 	speed.clear();
 	cost.clear();
@@ -261,44 +309,87 @@ void Dispach::function2() {//轮询调度
 	double thoughout = 0.0;
 	double jain = 0.0;
 	double timeleft = 0.0;
-	dispachedtime = 0;
-	time_dispach = time;
 	initInfo(sta_num);
 	thoughtout_vector.clear();
 	jain_vector.clear();
-	while (time_dispach--) {
-		++dispachedtime;
-		if (start < end) {
-			for (int i = start; i < end; ++i) {//得到所有优先级
-				getPrivityRR(i);//根据优化目标排列优先级
+	if (dkvalue != -1) {
+		dispachedtime = 0;
+		time_dispach = time;
+		while (time_dispach--) {
+			++dispachedtime;
+			if (start < end) {
+				for (int i = start; i < end; ++i) {//得到所有优先级
+					getPrivityRR(i);//根据优化目标排列优先级
+				}
 			}
-		}
-		else {
-			for (int i = start; i < sta_num; ++i) {
-				getPrivityRR(i);
+			else {
+				for (int i = start; i < sta_num; ++i) {
+					getPrivityRR(i);
+				}
+				for (int i = 0; i < end; ++i) {
+					getPrivityRR(i);
+				}
 			}
-			for (int i = 0; i < end; ++i) {
-				getPrivityRR(i);
+			for (int i = 0; i < privity.size() && i < dispachnum; ++i) {
+				dispach_id.push_back(privity[i].first);
 			}
-		}
-		for (int i = 0; i < privity.size() && i < dispachnum; ++i) {
-			dispach_id.push_back(privity[i].first);
-		}
-		//调度，每次调度的最小时间单位为1ms,剩下时间优先满足高优先级
+			//调度，每次调度的最小时间单位为1ms,剩下时间优先满足高优先级
 
-		timeleft = dispachlenth - dispachnum * 1.0;
-		speed.clear();
-		cost.clear();
-		info.clear();
-		getThoughoutJain(timeleft, thoughout, jain);
-		thoughtout_vector.push_back(thoughout);
-		jain_vector.push_back(jain);
-		fc2 << "吞吐量：" << thoughout << "Mb/s" << std::endl;
-		fc2 << "Jain：" << jain << std::endl;
-		start = (start + dispachnum) % sta_num;
-		end = (end + dispachnum) % sta_num;
-		privity.clear();
-		dispach_id.clear();
+			timeleft = dispachlenth - dispachnum * 1.0;
+			speed.clear();
+			cost.clear();
+			info.clear();
+			getThoughoutJain(timeleft, thoughout, jain);
+			thoughtout_vector.push_back(thoughout);
+			jain_vector.push_back(jain);
+			fc2 << "吞吐量：" << thoughout << "Mb/s" << std::endl;
+			fc2 << "Jain：" << jain << std::endl;
+			start = (start + dispachnum) % sta_num;
+			end = (end + dispachnum) % sta_num;
+			privity.clear();
+			dispach_id.clear();
+		}
+	}
+	else {
+		for (int m_t = 0; m_t < 3; ++m_t) {
+			dispachedtime = 0;
+			time_dispach = time;
+			int len = sta_info.size() / 3;
+			while (time_dispach--) {
+				++dispachedtime;
+				if (start < end) {
+					for (int i = start; i < end; ++i) {//得到所有优先级
+						getPrivityRR(i + len * m_t);//根据优化目标排列优先级
+					}
+				}
+				else {
+					for (int i = start; i < sta_num; ++i) {
+						getPrivityRR(i + len * m_t);
+					}
+					for (int i = 0; i < end; ++i) {
+						getPrivityRR(i + len * m_t);
+					}
+				}
+				for (int i = 0; i < privity.size() && i < dispachnum; ++i) {
+					dispach_id.push_back(privity[i].first);
+				}
+				//调度，每次调度的最小时间单位为1ms,剩下时间优先满足高优先级
+
+				timeleft = dispachlenth - dispachnum * 1.0;
+				speed.clear();
+				cost.clear();
+				info.clear();
+				getThoughoutJain(timeleft, thoughout, jain);
+				thoughtout_vector.push_back(thoughout);
+				jain_vector.push_back(jain);
+				fc2 << "吞吐量：" << thoughout << "Mb/s" << std::endl;
+				fc2 << "Jain：" << jain << std::endl;
+				start = (start + dispachnum) % sta_num;
+				end = (end + dispachnum) % sta_num;
+				privity.clear();
+				dispach_id.clear();
+			}
+		}
 	}
 	speed.clear();
 	cost.clear();
@@ -314,51 +405,100 @@ void Dispach::function3() { //最大mcs调度
 	double thoughout = 0.0;
 	double jain = 0.0;
 	double timeleft = 0.0;
-	dispachedtime = 0;
-	time_dispach = time;
 	initInfo(sta_num);
 	thoughtout_vector.clear();
 	jain_vector.clear();
-	while (time_dispach--) {
-		++dispachedtime;
-		for (int i = 0; i < sta_info.size(); ++i) {//得到所有优先级
-			getPrivityMCS(i);
-		}
-		for (int i = 0; i < privity.size() && i < dispachnum; ++i) {//选择优先级最高的n个调度
-			dispach_id.push_back(privity[i].first);
-		}
-		//根据优化目标重排优先级
-		if (aim == 1) {//比例公平优化，根据比例公平系数重排优先级分配资源
-			std::vector<std::pair<int, double> > tmp;
-			tmp.clear();
-			for (int i = 0; i < dispach_id.size(); ++i) {
-				int j = 0;
-				double mcs_tmp = 0.0;
-				mcs_tmp = sta_info[dispach_id[i]]->getPrivity_f1(dispachedtime);
-				for (j = 0; j < tmp.size(); ++j) {
-					if (mcs_tmp > tmp[j].second)
-						break;
+	if (dkvalue != -1) {
+		dispachedtime = 0;
+		time_dispach = time;
+		while (time_dispach--) {
+			++dispachedtime;
+			for (int i = 0; i < sta_info.size(); ++i) {//得到所有优先级
+				getPrivityMCS(i);
+			}
+			for (int i = 0; i < privity.size() && i < dispachnum; ++i) {//选择优先级最高的n个调度
+				dispach_id.push_back(privity[i].first);
+			}
+			//根据优化目标重排优先级
+			if (aim == 1) {//比例公平优化，根据比例公平系数重排优先级分配资源
+				std::vector<std::pair<int, double> > tmp;
+				tmp.clear();
+				for (int i = 0; i < dispach_id.size(); ++i) {
+					int j = 0;
+					double mcs_tmp = 0.0;
+					mcs_tmp = sta_info[dispach_id[i]]->getPrivity_f1(dispachedtime);
+					for (j = 0; j < tmp.size(); ++j) {
+						if (mcs_tmp > tmp[j].second)
+							break;
+					}
+					tmp.insert(tmp.begin() + j, std::pair<int, double>(dispach_id[i], mcs_tmp));
 				}
-				tmp.insert(tmp.begin() + j, std::pair<int, double>(dispach_id[i], mcs_tmp));
+				dispach_id.clear();
+				for (int i = 0; i < tmp.size(); ++i) {//选择优先级最高的n个调度
+					dispach_id.push_back(tmp[i].first);
+				}
+				tmp.clear();
 			}
-			dispach_id.clear();
-			for (int i = 0; i < tmp.size(); ++i) {//选择优先级最高的n个调度
-				dispach_id.push_back(tmp[i].first);
-			}
-			tmp.clear();
-		}
 
-		timeleft = dispachlenth - dispachnum * 1.0;//周期设置
-		speed.clear();
-		cost.clear();
-		info.clear();
-		getThoughoutJain(timeleft, thoughout, jain);
-		thoughtout_vector.push_back(thoughout);
-		jain_vector.push_back(jain);
-		fc3 << "吞吐量：" << thoughout << "Mb/s" << std::endl;
-		fc3 << "Jain：" << jain << std::endl;
-		privity.clear();
-		dispach_id.clear();
+			timeleft = dispachlenth - dispachnum * 1.0;//周期设置
+			speed.clear();
+			cost.clear();
+			info.clear();
+			getThoughoutJain(timeleft, thoughout, jain);
+			thoughtout_vector.push_back(thoughout);
+			jain_vector.push_back(jain);
+			fc3 << "吞吐量：" << thoughout << "Mb/s" << std::endl;
+			fc3 << "Jain：" << jain << std::endl;
+			privity.clear();
+			dispach_id.clear();
+		}
+	}
+	else {
+		for (int m_t = 0; m_t < 3; ++m_t) {
+			dispachedtime = 0;
+			time_dispach = time;
+			int len = sta_info.size() / 3;
+			while (time_dispach--) {
+				for (int i = len * m_t; i < len * (m_t + 1); ++i) {//得到所有优先级
+					getPrivityMCS(i);
+				}
+				for (int i = 0; i < privity.size() && i < dispachnum; ++i) {//选择优先级最高的n个调度
+					dispach_id.push_back(privity[i].first);
+				}
+				//根据优化目标重排优先级
+				if (aim == 1) {//比例公平优化，根据比例公平系数重排优先级分配资源
+					std::vector<std::pair<int, double> > tmp;
+					tmp.clear();
+					for (int i = 0; i < dispach_id.size(); ++i) {
+						int j = 0;
+						double mcs_tmp = 0.0;
+						mcs_tmp = sta_info[dispach_id[i]]->getPrivity_f1(dispachedtime);
+						for (j = 0; j < tmp.size(); ++j) {
+							if (mcs_tmp > tmp[j].second)
+								break;
+						}
+						tmp.insert(tmp.begin() + j, std::pair<int, double>(dispach_id[i], mcs_tmp));
+					}
+					dispach_id.clear();
+					for (int i = 0; i < tmp.size(); ++i) {//选择优先级最高的n个调度
+						dispach_id.push_back(tmp[i].first);
+					}
+					tmp.clear();
+				}
+
+				timeleft = dispachlenth - dispachnum * 1.0;//周期设置
+				speed.clear();
+				cost.clear();
+				info.clear();
+				getThoughoutJain(timeleft, thoughout, jain);
+				thoughtout_vector.push_back(thoughout);
+				jain_vector.push_back(jain);
+				fc3 << "吞吐量：" << thoughout << "Mb/s" << std::endl;
+				fc3 << "Jain：" << jain << std::endl;
+				privity.clear();
+				dispach_id.clear();
+			}
+		}
 	}
 	speed.clear();
 	cost.clear();

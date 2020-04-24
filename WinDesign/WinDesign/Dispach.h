@@ -25,7 +25,7 @@ private:
 public:
 	Dispach();
 	~Dispach();
-	void produceInfo();
+	void produceInfo(int dkvalue);
 	void clearInfo();
 	void initInfo(int sta_num);
 	void startDispach(int type);

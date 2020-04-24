@@ -11,7 +11,7 @@ class CResultDlg : public CDialogEx
 public:
 	CResultDlg(CWnd* pParent = nullptr);   // 标准构造函数
 	virtual ~CResultDlg();
-	void Drawxy(CPaintDC *dc,int width,int height);
+	void Drawxy(CPaintDC & dc,int width,int height, double maxy, int maxx);
 
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
@@ -32,9 +32,11 @@ public:
 	int dispachnum;
 	int thoughoutjain;
 	int dispachtype;
+	int dkvalue;
 	double dispachlenth;
 	std::vector<double> data_show;
 	CPoint * paint_info;
 public:
 	void setxy(double w, double l, int basex, int basey);
+	void DrawXY(CPaintDC & dc,int w, int l, double maxy, int maxx);
 };

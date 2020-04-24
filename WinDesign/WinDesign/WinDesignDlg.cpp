@@ -52,6 +52,7 @@ CWinDesignDlg::CWinDesignDlg(CWnd* pParent /*=nullptr*/)
 	dispachnum = 8;
 	thoughoutjain = 1;
 	dispachtype = 1;
+	dkvalue = 20;
 }
 
 void CWinDesignDlg::DoDataExchange(CDataExchange* pDX) {
@@ -178,6 +179,7 @@ void CWinDesignDlg::OnBnClickedOk() {
 	result.thoughoutjain = thoughoutjain;
 	result.dispachtype = dispachtype;
 	result.dispachlenth = dispachlenth;
+	result.dkvalue = dkvalue;
 	for (int i = 0; i < info_data.size(); ++i) {
 		result.data_show.push_back(info_data[i]);
 	}
@@ -398,7 +400,7 @@ void CWinDesignDlg::getThoughtorJain(std::vector<double> & data) {
 
 void CWinDesignDlg::Dispachinfo() {
 	Dispach dispach; 
-	dispach.produceInfo();
+	dispach.produceInfo(dkvalue);
 	if (sta_num == -1) {
 		for (int i = 0; i < 3; ++i) {
 			dispach.initInfo(sta_num_list[i]);
@@ -454,17 +456,6 @@ void CWinDesignDlg::Dispachinfo() {
 				getThoughtorJain(dispach.jain_vector);
 		}
 	}
-	else if (dkvalue == -1) {
-		for (int i = 0; i < 3; ++i) {
-			dispach.initInfo(sta_num);
-			dispach.setDispach(time, dispachnum, dispachlenth);
-			dispach.startDispach(aim * dispachtype);
-			if (thoughoutjain == 1)
-				getThoughtorJain(dispach.thoughtout_vector);
-			else
-				getThoughtorJain(dispach.jain_vector);
-		}
-	}
 	else {
 		dispach.initInfo(sta_num);
 		dispach.setDispach(time, dispachnum, dispachlenth);
@@ -484,11 +475,6 @@ void CWinDesignDlg::Dispachinfo() {
 	
 	dispach.clearInfo();
 	dispach.~Dispach();
-	/*
-	std::string  str = "Aim:" + std::to_string(aim) + "tjain:" + std::to_string(thoughoutjain) + "distype:" + std::to_string(dispachtype);
-	CString strtest(str.c_str());
-	MessageBox(strtest, _T("test"));
-	*/
 }
 
 
