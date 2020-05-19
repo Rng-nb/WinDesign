@@ -15,15 +15,16 @@ void STA::produceInfo() {
 	int i = 500;//数据源的数量
 	bool flag_first = true; //标志第一次信息产生
 	double time_tmp = 0.0;
+	std::exponential_distribution<double> random_time(lambda_ex_time);//时间间隔符合参数为lambda1的指数分布
+	std::poisson_distribution<int> random_info(lambda_po_info);//时间间隔t内的数据量符合参数为lambda2*t的泊松分布
+	std::uniform_int_distribution<int> random_un(1, 8);//随机一个速度值
 	while (i--) {
-		std::exponential_distribution<double> random_time(lambda_ex_time);//时间间隔符合参数为lambda1的指数分布
 		double time_rand = random_time(random);//随机一个时间间隔
 
 		double lambda = lambda_po_info * time_rand * 1000; //λt呈泊松分布
-		std::poisson_distribution<int> random_info(lambda);//时间间隔t内的数据量符合参数为lambda2*t的泊松分布
+		
 		int info_rand = random_info(random);//随机一个数据包数量
 
-		std::uniform_int_distribution<int> random_un(1, 8);//随机一个速度值
 		channel_speed = speed[random_un(random) - 1];
 
 		Info info_tmp; //存储产生的一次随机信息
